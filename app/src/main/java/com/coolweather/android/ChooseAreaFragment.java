@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.solver.SolverVariable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.coolweather.android.db.City;
 import com.coolweather.android.db.County;
@@ -28,7 +28,6 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 /**
@@ -37,8 +36,8 @@ import okhttp3.Response;
 
 public class ChooseAreaFragment extends Fragment {
     public static final int LEVEL_PROVINCE=0;
-    public static final int LEVEL_CITY=0;
-    public static final int LEVEL_COUNTY=0;
+    public static final int LEVEL_CITY=1;
+    public static final int LEVEL_COUNTY=2;
     private ProgressDialog progressDialog;
     private TextView titleText;
     private Button backButton;
@@ -156,7 +155,13 @@ public class ChooseAreaFragment extends Fragment {
         HttpUtil.sendOkHttpRequest(address, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        closeProgressDialog();
+                        Toast.makeText(getActivity(),"加载失败",Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
