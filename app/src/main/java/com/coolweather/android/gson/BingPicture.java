@@ -6,4 +6,5 @@ package com.coolweather.android.gson;
 
 public class BingPicture {
     public String url;
+    public String enddate;
 }
