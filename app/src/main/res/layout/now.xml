@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="100dp"
     android:layout_margin="15dp">
+
+    <ImageView
+        android:id="@+id/weather_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="35dp" />
+
     <TextView
         android:id="@+id/degree_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:textSize="60sp"
-        android:textColor="#fff"/>
+        android:layout_alignParentRight="true"
+        android:textColor="#fff"
+        android:textSize="60sp" />
+
     <TextView
         android:id="@+id/weather_info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:textSize="20sp"
-        android:textColor="#fff"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:textColor="#fff"
+        android:textSize="20sp" />
 
-</LinearLayout>
+</RelativeLayout>

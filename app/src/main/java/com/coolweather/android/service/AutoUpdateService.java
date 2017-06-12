@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 
 import com.coolweather.android.R;
+import com.coolweather.android.WeatherActivity;
 import com.coolweather.android.gson.BingPicture;
 import com.coolweather.android.gson.Weather;
 import com.coolweather.android.util.HttpUtil;
@@ -39,7 +40,7 @@ public class AutoUpdateService extends Service {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherTime = preferences.getString("weathertime", null);
         if (weatherTime != null) {
-            if (paresDateString(weatherTime) >= 1) {
+            if (WeatherActivity.paresDateString(weatherTime,WeatherActivity.SHORT_TIME) >= 1) {
                 updateBingPicture();
             }
         }
@@ -106,19 +107,5 @@ public class AutoUpdateService extends Service {
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    //返回大于等于1的，都是属于过时数据，需要更新
-    private long paresDateString(String dateString) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-        try {
-            Date date = dateFormat.parse(dateString);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            return (System.currentTimeMillis() - cal.getTimeInMillis()) / (24 * 3600 * 1000);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return 1;
     }
 }

@@ -29,6 +29,11 @@ import com.coolweather.android.util.HttpUtil;
 import com.coolweather.android.util.Utility;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -40,6 +45,7 @@ public class WeatherActivity extends AppCompatActivity {
     public SwipeRefreshLayout swipeRefreshLayout;
     private ScrollView weatherLayout;
     private Button navigationButton;
+    private ImageView weatherIcon;
     private TextView titleCityText;
     private TextView titleUpdateTimeText;
     private TextView degreeText;
@@ -52,6 +58,9 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView carWashText;
     private TextView sportText;
     public String weatherId;
+    public final static int LONG_TIME=0;
+    public final static int SHORT_TIME=1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +78,7 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         navigationButton= (Button) findViewById(R.id.nav_button);
+        weatherIcon= (ImageView) findViewById(R.id.weather_icon);
         titleCityText = (TextView) findViewById(R.id.title_city);
         titleUpdateTimeText = (TextView) findViewById(R.id.title_update_time);
         degreeText = (TextView) findViewById(R.id.degree_text);
@@ -130,6 +140,18 @@ public class WeatherActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences preference=PreferenceManager.getDefaultSharedPreferences(this);
+        String date=preference.getString("weathertime",null);
+        if (date!=null&&paresDateString(date,LONG_TIME)>=1){
+            swipeRefreshLayout.setRefreshing(true);
+            requestWeather(weatherId);
+        }
+
+
+    }
 
     public void requestWeather(String weatherId) {
         Resources resources = getResources();
@@ -211,6 +233,7 @@ public class WeatherActivity extends AppCompatActivity {
 
         titleCityText.setText(weather.basic.cityName);
         titleUpdateTimeText.setText(weather.basic.update.updateTime.split(" ")[1]);
+        Glide.with(this).load("https://cdn.heweather.com/cond_icon/"+weather.now.more.code+".png").into(weatherIcon);
         degreeText.setText(weather.now.temperature + "℃");
         weatherInfoText.setText(weather.now.more.info);
         forecastLayout.removeAllViews();
@@ -243,6 +266,27 @@ public class WeatherActivity extends AppCompatActivity {
         weatherLayout.setVisibility(View.VISIBLE);
         Intent intent = new Intent(this, AutoUpdateService.class);
         startService(intent);
+    }
+
+    //返回大于等于1的，都是属于过时数据，需要更新
+    public static long paresDateString(String dateString,int type) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        if (type==LONG_TIME){
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        }
+
+        try {
+            Date date = dateFormat.parse(dateString);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            if (type==LONG_TIME){
+                return (System.currentTimeMillis() - cal.getTimeInMillis()) / (10 * 60 * 1000);
+            }
+            return (System.currentTimeMillis() - cal.getTimeInMillis()) / (24 * 3600 * 1000);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
 }
